@@ -56,7 +56,7 @@ class _BackendDataScreenState extends State<BackendDataScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('TontiLink'), actions: [IconButton(tooltip: 'Actualiser', onPressed: loading ? null : _load, icon: const Icon(Icons.refresh)), IconButton(tooltip: 'Déconnexion', onPressed: _logout, icon: const Icon(Icons.logout))]),
       body: Column(children: [
-        Container(width: double.infinity, padding: const EdgeInsets.fromLTRB(16, 10, 16, 12), color: const Color(0xFFF9F3DF), child: const Text('Données en direct depuis l’API Django • 10.173.147.1:8000', style: TextStyle(fontWeight: FontWeight.w600))),
+        Container(width: double.infinity, padding: const EdgeInsets.fromLTRB(16, 10, 16, 12), color: const Color(0xFFF9F3DF), child: Text('Données en direct depuis l’API Django • ${api.baseUrl}', style: const TextStyle(fontWeight: FontWeight.w600))),
         SizedBox(height: 64, child: ListView.separated(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), itemCount: sections.length, separatorBuilder: (_, __) => const SizedBox(width: 8), itemBuilder: (context, i) => ChoiceChip(label: Text(sections[i].label), avatar: Icon(sections[i].icon, size: 18), selected: selected == i, onSelected: (_) { setState(() { selected = i; payload = null; }); _load(); }))),
         Expanded(child: RefreshIndicator(onRefresh: _load, child: ListView(padding: const EdgeInsets.all(16), children: [
           Text(section.label, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),

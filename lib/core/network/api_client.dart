@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../constants/api_constants.dart';
+
 /// Client HTTP pour la communication entre Flutter et l'API Django REST.
 class ApiClient {
   static final ApiClient _instance = ApiClient._internal();
@@ -11,10 +13,7 @@ class ApiClient {
 
   ApiClient._internal();
 
-  // String _baseUrl = 'http://172.29.66.1:8000';
-  // String _baseUrl = 'http://192.168.1.117:8000';
-  String _baseUrl = 'http://10.103.60.1:8000';
-
+  String _baseUrl = ApiConstants.baseUrl;
 
   String? _token;
 
@@ -37,10 +36,19 @@ class ApiClient {
   Uri _buildUri(String endpoint, [Map<String, String>? queryParams]) {
     final parsedEndpoint =
         Uri.parse(endpoint.startsWith('/') ? endpoint : '/$endpoint');
-    final path = parsedEndpoint.path.endsWith('/')
+    var path = parsedEndpoint.path.endsWith('/')
         ? parsedEndpoint.path
         : '${parsedEndpoint.path}/';
-    final uri = Uri.parse('$_baseUrl$path');
+
+    final cleanBase = _baseUrl.endsWith('/')
+        ? _baseUrl.substring(0, _baseUrl.length - 1)
+        : _baseUrl;
+
+    if (cleanBase.endsWith('/api') && path.startsWith('/api/')) {
+      path = path.substring(4);
+    }
+
+    final uri = Uri.parse('$cleanBase$path');
     final allQueryParams = <String, String>{
       ...parsedEndpoint.queryParameters,
       ...?queryParams,
