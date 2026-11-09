@@ -67,8 +67,8 @@ class _TontiLinkAppState extends State<TontiLinkApp> {
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-          // Le thème sombre s'applique aux pages publiques (accueil, connexion).
-          themeMode: authenticated ? ThemeMode.light : _themeController.mode,
+          // Le thème sombre s'applique harmonieusement sur toute l'application.
+          themeMode: _themeController.mode,
           scrollBehavior: const MaterialScrollBehavior().copyWith(
             scrollbars: true,
           ),

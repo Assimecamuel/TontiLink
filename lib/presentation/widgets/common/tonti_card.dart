@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/public_palette.dart';
 import '../../../core/theme/tonti_colors.dart';
 
 class TontiCard extends StatelessWidget {
@@ -21,16 +22,25 @@ class TontiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final p = Pal.of(context);
     final borderSide = hasGoldBorder
-        ? const BorderSide(color: TontiColors.primaryGold, width: 1.5)
-        : const BorderSide(color: TontiColors.border, width: 1);
+        ? BorderSide(color: p.gold, width: 1.5)
+        : BorderSide(color: p.border, width: 1);
 
     Widget content = Container(
       decoration: BoxDecoration(
-        color: backgroundColor ?? TontiColors.cardBg,
+        color: backgroundColor ?? p.surface,
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.fromBorderSide(borderSide),
-        boxShadow: [TontiColors.softShadow],
+        boxShadow: [
+          BoxShadow(
+            color: p.dark
+                ? Colors.black.withOpacity(0.3)
+                : TontiColors.textPrimary.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       padding: padding,
       child: child,
@@ -42,7 +52,7 @@ class TontiCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(borderRadius),
-          hoverColor: TontiColors.primaryGold.withOpacity(0.04),
+          hoverColor: p.gold.withOpacity(0.06),
           child: content,
         ),
       );

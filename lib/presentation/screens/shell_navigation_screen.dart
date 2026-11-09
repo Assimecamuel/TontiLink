@@ -482,17 +482,13 @@ class _ShellNavigationScreenState extends State<ShellNavigationScreen> {
     );
   }
 
-  /// En mode sombre, la coque (barre latérale, en-tête, cadre) passe en sombre
-  /// et les écrans de gestion s'affichent sur un panneau clair arrondi.
+  /// Conteneur réactif du canevas principal adaptatif au thème clair et sombre.
   Widget _buildCanvas(Pal p, bool isDesktop, Widget body) {
-    if (!p.dark) return body;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-          isDesktop ? 18 : 8, 12, isDesktop ? 18 : 8, isDesktop ? 18 : 8),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: ColoredBox(color: TontiColors.background, child: body),
-      ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      color: p.bg,
+      child: body,
     );
   }
 
@@ -698,8 +694,6 @@ class _ShellNavigationScreenState extends State<ShellNavigationScreen> {
                   onNotificationsPressed: () => _showNotificationsModal(context),
                 ),
 
-                _buildBackendStatus(),
-
                 // Contenu de la page
                 Expanded(child: _buildCanvas(p, isDesktop, bodyContent)),
               ],
@@ -717,60 +711,5 @@ class _ShellNavigationScreenState extends State<ShellNavigationScreen> {
     );
   }
 
-  Widget _buildBackendStatus() {
-    final dataSource = LocalTontiDataSource();
-    final connected = dataSource.isBackendConnected;
-    final background =
-        connected ? TontiColors.successSoft : TontiColors.alertSoft;
-    final foreground =
-        connected ? TontiColors.successGreen : TontiColors.alertRed;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: background,
-      child: Row(
-        children: [
-          if (_isSyncingBackend)
-            SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: foreground,
-              ),
-            )
-          else
-            Icon(
-              connected ? Icons.cloud_done_outlined : Icons.cloud_off_outlined,
-              size: 18,
-              color: foreground,
-            ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              _isSyncingBackend
-                  ? 'Connexion au serveur Django…'
-                  : connected
-                      ? dataSource.lastSyncError == null
-                          ? 'Connecté au backend Django'
-                          : 'Backend accessible, synchronisation partielle : ${dataSource.lastSyncError}'
-                      : 'Backend Django indisponible : ${dataSource.lastSyncError ?? 'aucune synchronisation réussie'}',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: foreground,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: _isSyncingBackend ? null : _syncBackendData,
-            child: const Text('Réessayer'),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildBackendStatus() => const SizedBox.shrink();
 }

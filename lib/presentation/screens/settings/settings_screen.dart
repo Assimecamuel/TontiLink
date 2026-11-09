@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/public_palette.dart';
+import '../../../core/theme/theme_controller.dart';
 import '../../../core/theme/tonti_colors.dart';
 import '../../../core/theme/tonti_typography.dart';
 import '../../../core/utils/responsive_helper.dart';
@@ -109,6 +111,69 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
+              // Paramètres d'Apparence & Thème
+              TontiCard(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.palette_rounded, color: TontiColors.primaryGold),
+                        const SizedBox(width: 10),
+                        Text('Apparence & Thème Expert', style: TontiTypography.headingMedium),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Personnalisez l’interface de TontiLink selon vos préférences visuelles ou l’éclairage ambiant :',
+                      style: TextStyle(fontSize: 13, color: TontiColors.textSecondary),
+                    ),
+                    const SizedBox(height: 16),
+                    ListenableBuilder(
+                      listenable: ThemeController.instance,
+                      builder: (context, _) {
+                        final currentMode = ThemeController.instance.mode;
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: _buildThemeOption(
+                                title: 'Clair',
+                                subtitle: 'Classique & Lumineux',
+                                icon: Icons.light_mode_rounded,
+                                isSelected: currentMode == ThemeMode.light,
+                                onTap: () => ThemeController.instance.setMode(ThemeMode.light),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildThemeOption(
+                                title: 'Sombre',
+                                subtitle: 'Confort visuel nuit',
+                                icon: Icons.dark_mode_rounded,
+                                isSelected: currentMode == ThemeMode.dark,
+                                onTap: () => ThemeController.instance.setMode(ThemeMode.dark),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildThemeOption(
+                                title: 'Système',
+                                subtitle: 'Automatique',
+                                icon: Icons.brightness_auto_rounded,
+                                isSelected: currentMode == ThemeMode.system,
+                                onTap: () => ThemeController.instance.setMode(ThemeMode.system),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
               // Paramètres de notifications
               TontiCard(
                 padding: const EdgeInsets.all(24),
@@ -186,6 +251,68 @@ class SettingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(desc, style: const TextStyle(fontSize: 11, color: TontiColors.textSecondary)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeOption({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected ? TontiColors.goldSoft : TontiColors.background,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? TontiColors.primaryGold : TontiColors.border,
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: TontiColors.primaryGold.withOpacity(0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 26,
+              color: isSelected ? TontiColors.darkGold : TontiColors.textSecondary,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                color: isSelected ? TontiColors.darkGold : TontiColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                color: isSelected ? TontiColors.darkGold.withOpacity(0.8) : TontiColors.textSecondary,
+              ),
+            ),
           ],
         ),
       ),

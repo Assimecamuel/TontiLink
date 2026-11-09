@@ -128,28 +128,26 @@ class ApiClient {
         data: parsedJson,
         rawBody: responseBody,
       );
-    } on http.ClientException catch (e) {
-      return ApiResponse(
+    } on http.ClientException {
+      return const ApiResponse(
         statusCode: 0,
         success: false,
         isNetworkError: true,
-        message:
-            'Serveur Django injoignable (${e.message}). Vérifiez le réseau et le backend.',
+        message: 'Impossible de se connecter au serveur. Vérifiez votre réseau.',
       );
     } on TimeoutException {
       return const ApiResponse(
         statusCode: 408,
         success: false,
         isNetworkError: true,
-        message:
-            'Délai d\'attente dépassé lors de la communication avec le serveur.',
+        message: 'Délai d\'attente dépassé lors de la connexion.',
       );
-    } catch (e) {
-      return ApiResponse(
+    } catch (_) {
+      return const ApiResponse(
         statusCode: 500,
         success: false,
         isNetworkError: true,
-        message: 'Erreur de communication : $e',
+        message: 'Une erreur de réseau est survenue.',
       );
     } finally {
       client.close();

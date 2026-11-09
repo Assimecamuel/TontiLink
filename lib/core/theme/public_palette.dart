@@ -8,10 +8,12 @@ class Pal {
   final bool dark;
   const Pal._(this.dark);
 
-  /// Le mode sombre est piloté par [ThemeController] (et non par le ThemeData),
-  /// ce qui permet d'avoir une coque sombre tout en gardant des boîtes de
-  /// dialogue lisibles dans les écrans de gestion.
-  factory Pal.of(BuildContext context) => Pal._(ThemeController.instance.isDark);
+  /// Détermine le mode sombre selon le contrôleur de thème et le contexte.
+  factory Pal.of(BuildContext context) {
+    final isDark = ThemeController.instance.isDark ||
+        Theme.of(context).brightness == Brightness.dark;
+    return Pal._(isDark);
+  }
 
   Color get bg => dark ? const Color(0xFF14110A) : AppColors.background;
   Color get surface => dark ? const Color(0xFF1F1A10) : AppColors.white;

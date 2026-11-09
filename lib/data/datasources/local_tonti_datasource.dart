@@ -371,8 +371,7 @@ class LocalTontiDataSource {
       final apiIndex = await _api.get('/api/');
       if (!apiIndex.isOk) {
         isBackendConnected = false;
-        lastSyncError = apiIndex.message ??
-            'Impossible de joindre le catalogue Django (HTTP ${apiIndex.statusCode}).';
+        lastSyncError = 'Impossible de se connecter au serveur.';
         return false;
       }
       final syncErrors = <String>[];

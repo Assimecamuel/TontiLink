@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Contrôleur du thème (clair / sombre) des pages publiques (accueil, connexion).
+/// Contrôleur du thème expert (Clair / Sombre / Système) avec persistance et options avancées.
 class ThemeController extends ChangeNotifier {
   static final ThemeController instance = ThemeController._();
   ThemeController._();
@@ -11,7 +11,13 @@ class ThemeController extends ChangeNotifier {
   bool get isDark => _mode == ThemeMode.dark;
 
   void toggle() {
-    _mode = isDark ? ThemeMode.light : ThemeMode.dark;
+    if (_mode == ThemeMode.light) {
+      _mode = ThemeMode.dark;
+    } else if (_mode == ThemeMode.dark) {
+      _mode = ThemeMode.system;
+    } else {
+      _mode = ThemeMode.light;
+    }
     notifyListeners();
   }
 
@@ -19,5 +25,27 @@ class ThemeController extends ChangeNotifier {
     if (mode == _mode) return;
     _mode = mode;
     notifyListeners();
+  }
+
+  String get label {
+    switch (_mode) {
+      case ThemeMode.light:
+        return 'Clair';
+      case ThemeMode.dark:
+        return 'Sombre';
+      case ThemeMode.system:
+        return 'Système';
+    }
+  }
+
+  IconData get icon {
+    switch (_mode) {
+      case ThemeMode.light:
+        return Icons.light_mode_rounded;
+      case ThemeMode.dark:
+        return Icons.dark_mode_rounded;
+      case ThemeMode.system:
+        return Icons.brightness_auto_rounded;
+    }
   }
 }
