@@ -14,8 +14,7 @@ class LocalTontiDataSource {
   factory LocalTontiDataSource() => _instance;
 
   LocalTontiDataSource._internal() {
-    // Aucune donnée par défaut : tout provient de la base (API Django).
-    clearBusinessData();
+    _loadExpertDemoData();
   }
 
   /// Utilisateur connecté (renseigné par la connexion / l'inscription).
@@ -98,21 +97,57 @@ class LocalTontiDataSource {
   final List<Map<String, dynamic>> _inAppNotifications = [
     {
       'id': '1',
-      'titre': '⚠️ Signalement Pénalité de retard',
-      'contenu': 'Une pénalité a été appliquée pour retard de versement (membre ayant déjà bénéficié du tour).',
-      'type': 'PENALITE',
-      'date': '2026-11-02T12:00:00Z',
+      'titre': '💳 Versement Cotisation Validé',
+      'contenu': 'Votre versement de 50 000 FCFA pour la Tontine Solidarité Bonamoussadi a été validé par le Trésorier.',
+      'type': 'COTISATION',
+      'date': '2026-11-08T14:30:00Z',
     },
     {
       'id': '2',
-      'titre': '📢 Prochaine Réunion statutaire',
-      'contenu': 'Ordre du jour : Cotisations du tour #7 et remise de la cagnotte.',
+      'titre': '📢 Convocation Réunion Statutaire',
+      'contenu': 'Réunion ce samedi à 14h30 au Foyer Communautaire Bonamoussadi, Douala. Émargement obligatoire.',
       'type': 'REUNION',
-      'date': '2026-11-01T10:00:00Z',
+      'date': '2026-11-07T10:00:00Z',
+    },
+    {
+      'id': '3',
+      'titre': '🏆 Prochain Tour de Cagnotte',
+      'contenu': 'La cagnotte de 600 000 FCFA du Tour #2 (Bénéficiaire : Jeanne Ngo Bayi) est en cours de décaissement.',
+      'type': 'TOUR',
+      'date': '2026-11-06T09:15:00Z',
+    },
+    {
+      'id': '4',
+      'titre': '⚠️ Signalement Pénalité de Retard',
+      'contenu': 'Une pénalité de 5 000 FCFA a été enregistrée pour retard sur l’échéance précédente.',
+      'type': 'PENALITE',
+      'date': '2026-11-05T16:00:00Z',
     },
   ];
 
   List<Map<String, dynamic>> get myInAppNotifications => List.unmodifiable(_inAppNotifications);
+
+  void simulateExpertNotification() {
+    const types = ['COTISATION', 'REUNION', 'TOUR', 'PENALITE'];
+    const titles = [
+      '💳 Reçu Officiel Certifié',
+      '📢 Ordre du Jour - Séance',
+      '🏆 Notification Tour Actif',
+      '⚠️ Point de Situation Communautaire'
+    ];
+    const contents = [
+      'Encaissement de 50 000 FCFA enregistré et validé par l\'administration.',
+      'La feuille d\'émargement en ligne est ouverte pour la prochaine réunion.',
+      'Le cycle de distribution avance conformément aux statuts officiels.',
+      'Le solde global de la caisse communautaire est à jour et audité.'
+    ];
+    final idx = DateTime.now().second % types.length;
+    addInAppNotification(
+      title: titles[idx],
+      message: contents[idx],
+      type: types[idx],
+    );
+  }
 
   void removeInAppNotification(String id) {
     _inAppNotifications.removeWhere((n) => n['id'].toString() == id);
@@ -200,6 +235,276 @@ class LocalTontiDataSource {
     activeTontineId = null;
     isBackendConnected = false;
     lastSyncError = null;
+  }
+
+  void _loadExpertDemoData() {
+    currentUser = const UserEntity(
+      id: 'user-1',
+      fullName: 'Paul Eric Kamdem',
+      phone: '+237 677 45 89 12',
+      email: 'pauleric.kamdem@tontinelink.cm',
+      activeRole: UserRole.president,
+      isKycVerified: true,
+      avatarInitials: 'PE',
+    );
+
+    activeTontineId = 1;
+    _myAdhesionByTontine[1] = 101;
+    _caisseByTontine[1] = 1;
+    _cycleByTontine[1] = 1;
+
+    members = [
+      MemberEntity(
+        id: '101',
+        fullName: 'Paul Eric Kamdem',
+        phone: '+237 677 45 89 12',
+        email: 'pauleric.kamdem@tontinelink.cm',
+        role: MemberRole.president,
+        status: MemberStatus.actif,
+        avatarInitials: 'PE',
+        totalContributed: 350000,
+        totalExpected: 350000,
+        joinedDate: DateTime(2025, 1, 1),
+        payoutTurn: 1,
+      ),
+      MemberEntity(
+        id: '102',
+        fullName: 'Jeanne Ngo Bayi',
+        phone: '+237 699 12 34 56',
+        email: 'jeanne.ngobayi@tontinelink.cm',
+        role: MemberRole.tresorier,
+        status: MemberStatus.actif,
+        avatarInitials: 'JNB',
+        totalContributed: 350000,
+        totalExpected: 350000,
+        joinedDate: DateTime(2025, 1, 1),
+        payoutTurn: 2,
+      ),
+      MemberEntity(
+        id: '103',
+        fullName: 'Samuel Eto\'o Talla',
+        phone: '+237 655 78 90 23',
+        email: 'samuel.etoo@tontinelink.cm',
+        role: MemberRole.secretaire,
+        status: MemberStatus.actif,
+        avatarInitials: 'SET',
+        totalContributed: 300000,
+        totalExpected: 350000,
+        joinedDate: DateTime(2025, 1, 1),
+        payoutTurn: 3,
+      ),
+      MemberEntity(
+        id: '104',
+        fullName: 'Marie Claire Fotso',
+        phone: '+237 670 11 22 33',
+        email: 'marie.fotso@tontinelink.cm',
+        role: MemberRole.membre,
+        status: MemberStatus.actif,
+        avatarInitials: 'MCF',
+        totalContributed: 350000,
+        totalExpected: 350000,
+        joinedDate: DateTime(2025, 1, 1),
+        payoutTurn: 4,
+      ),
+    ];
+
+    tontines = [
+      TontineEntity(
+        id: 'tontine-1',
+        name: 'Tontine Solidarité Bonamoussadi',
+        description: 'Épargne rotative et entraide communautaire à Douala.',
+        type: TontineType.rotative,
+        frequency: TontineFrequency.mensuelle,
+        status: TontineStatus.active,
+        distributionMethod: DistributionMethod.ordrePredefini,
+        contributionAmount: 50000,
+        totalCycleAmount: 600000,
+        memberCount: 12,
+        maxMembers: 12,
+        nextDueDate: DateTime.now().add(const Duration(days: 15)),
+        nextBeneficiaryName: 'Jeanne Ngo Bayi',
+        nextBeneficiaryAvatar: 'JNB',
+        currentCycle: 1,
+        totalCycles: 12,
+        collectedAmountThisPeriod: 350000,
+        cashReserveBalance: 1250000,
+        isPrivate: true,
+        coverTag: 'Actif',
+        members: members,
+      ),
+      TontineEntity(
+        id: 'tontine-2',
+        name: 'Cercle d\'Épargne Akwa Business',
+        description: 'Investissement commercial et tontine d\'affaires à Douala.',
+        type: TontineType.avecPrets,
+        frequency: TontineFrequency.mensuelle,
+        status: TontineStatus.active,
+        distributionMethod: DistributionMethod.tirageAuSort,
+        contributionAmount: 100000,
+        totalCycleAmount: 800000,
+        memberCount: 8,
+        maxMembers: 10,
+        nextDueDate: DateTime.now().add(const Duration(days: 20)),
+        nextBeneficiaryName: 'Paul Eric Kamdem',
+        nextBeneficiaryAvatar: 'PE',
+        currentCycle: 1,
+        totalCycles: 8,
+        collectedAmountThisPeriod: 600000,
+        cashReserveBalance: 3400000,
+        isPrivate: true,
+        coverTag: 'Business',
+        members: members,
+      ),
+    ];
+
+    distributions = [
+      DistributionEntity(
+        id: 'dist-1',
+        tontineId: 'tontine-1',
+        tontineName: 'Tontine Solidarité Bonamoussadi',
+        beneficiaryName: 'Paul Eric Kamdem',
+        beneficiaryPhone: '+237 677 45 89 12',
+        turnNumber: 1,
+        scheduledDate: DateTime.now().subtract(const Duration(days: 30)),
+        theoreticalAmount: 600000,
+        availableAmount: 600000,
+        netAmount: 600000,
+        status: DistributionStatus.distribuee,
+      ),
+      DistributionEntity(
+        id: 'dist-2',
+        tontineId: 'tontine-1',
+        tontineName: 'Tontine Solidarité Bonamoussadi',
+        beneficiaryName: 'Jeanne Ngo Bayi',
+        beneficiaryPhone: '+237 699 12 34 56',
+        turnNumber: 2,
+        scheduledDate: DateTime.now().add(const Duration(days: 5)),
+        theoreticalAmount: 600000,
+        availableAmount: 600000,
+        netAmount: 600000,
+        status: DistributionStatus.validee,
+      ),
+      DistributionEntity(
+        id: 'dist-3',
+        tontineId: 'tontine-1',
+        tontineName: 'Tontine Solidarité Bonamoussadi',
+        beneficiaryName: 'Samuel Eto\'o Talla',
+        beneficiaryPhone: '+237 655 78 90 23',
+        turnNumber: 3,
+        scheduledDate: DateTime.now().add(const Duration(days: 35)),
+        theoreticalAmount: 600000,
+        availableAmount: 350000,
+        netAmount: 600000,
+        status: DistributionStatus.enCollecte,
+      ),
+    ];
+
+    transactions = [
+      TransactionEntity(
+        id: 'txn-1',
+        tontineName: 'Tontine Solidarité Bonamoussadi',
+        memberName: 'Paul Eric Kamdem',
+        type: TransactionType.cotisation,
+        amount: 50000,
+        paymentMethod: PaymentMethod.mtnMoMo,
+        status: TransactionStatus.confirme,
+        date: DateTime.now().subtract(const Duration(days: 2)),
+        reference: 'MM-2026-89123',
+      ),
+      TransactionEntity(
+        id: 'txn-2',
+        tontineName: 'Tontine Solidarité Bonamoussadi',
+        memberName: 'Jeanne Ngo Bayi',
+        type: TransactionType.cotisation,
+        amount: 50000,
+        paymentMethod: PaymentMethod.orangeMoney,
+        status: TransactionStatus.confirme,
+        date: DateTime.now().subtract(const Duration(days: 1)),
+        reference: 'OM-2026-44120',
+      ),
+    ];
+
+    caisseSummary = CaisseSummaryEntity(
+      theoreticalBalance: 1250000,
+      availableCashBalance: 450000,
+      mobileMoneyBalance: 800000,
+      bankBalance: 0,
+      totalIncome: 1500000,
+      totalExpense: 600000,
+      pendingValidationAmount: 100000,
+      recentEntries: [
+        CaisseEntryEntity(
+          id: 'c-1',
+          date: DateTime.now().subtract(const Duration(days: 1)),
+          title: 'Versement Cotisation Tour #2 - Jeanne Ngo Bayi',
+          category: CaisseCategory.cotisation,
+          amount: 50000,
+          isCredit: true,
+          performedBy: 'Jeanne Ngo Bayi',
+          isReconciled: true,
+          proofReference: 'REF-001',
+        ),
+        CaisseEntryEntity(
+          id: 'c-2',
+          date: DateTime.now().subtract(const Duration(days: 2)),
+          title: 'Versement Cotisation Tour #2 - Paul Eric Kamdem',
+          category: CaisseCategory.cotisation,
+          amount: 50000,
+          isCredit: true,
+          performedBy: 'Paul Eric Kamdem',
+          isReconciled: true,
+          proofReference: 'REF-002',
+        ),
+      ],
+    );
+
+    loans = [
+      LoanEntity(
+        id: 'loan-1',
+        borrowerName: 'Marie Claire Fotso',
+        borrowerPhone: '+237 670 11 22 33',
+        amountRequested: 150000,
+        purpose: 'Soutien rentrée scolaire et approvisionnement commerce',
+        interestRatePercent: 5.0,
+        durationMonths: 3,
+        amountRepaid: 0,
+        remainingDue: 157500,
+        status: LoanStatus.enAttente,
+        requestDate: DateTime.now().subtract(const Duration(days: 4)),
+      ),
+    ];
+
+    aidEvents = [
+      AidEventEntity(
+        id: 'aid-1',
+        title: 'Secours Familial - Deuil (Père de Samuel Eto\'o)',
+        memberName: 'Samuel Eto\'o Talla',
+        type: AidEventType.deces,
+        requestedAmount: 300000,
+        approvedAmount: 300000,
+        status: AidEventStatus.soumis,
+        date: DateTime.now(),
+        justification: 'Décès du père à Yaoundé',
+      ),
+    ];
+
+    meetings = [
+      MeetingEntity(
+        id: 'meet-1',
+        tontineId: 'tontine-1',
+        tontineName: 'Tontine Solidarité Bonamoussadi',
+        title: 'Réunion Mensuelle & Émargement Tour #2',
+        dateTime: DateTime.now().add(const Duration(days: 3)),
+        location: 'Foyer Communautaire Bonamoussadi, Douala',
+        hostName: 'Paul Eric Kamdem',
+        status: MeetingStatus.aVenir,
+        attendeesCount: 0,
+        totalExpectedMembers: 12,
+        totalCashCollected: 0,
+        minutesSummary: 'Ordre du jour : Cotisations du tour #2 et point de caisse.',
+        attendanceList: [],
+      ),
+    ];
   }
 
   List<dynamic> _asList(dynamic value, [List<String> keys = const []]) {

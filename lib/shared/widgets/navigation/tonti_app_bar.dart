@@ -129,14 +129,23 @@ class TontiAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
               if (LocalTontiDataSource().myInAppNotifications.isNotEmpty)
                 Positioned(
-                  right: 8,
-                  top: 8,
+                  right: 4,
+                  top: 4,
                   child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
+                    padding: const EdgeInsets.all(4),
+                    constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                    decoration: BoxDecoration(
                       color: TontiColors.alertRed,
-                      shape: BoxShape.circle,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '${LocalTontiDataSource().myInAppNotifications.length}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),

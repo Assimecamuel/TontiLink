@@ -94,7 +94,7 @@ class TontiAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
 
-    final hasUnreadNotifs = LocalTontiDataSource().myInAppNotifications.isNotEmpty;
+    final notifCount = LocalTontiDataSource().myInAppNotifications.length;
 
     final bell = Stack(
       children: [
@@ -103,14 +103,26 @@ class TontiAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: Icon(Icons.notifications_none_rounded, color: p.text, size: 25),
           tooltip: 'Notifications',
         ),
-        if (hasUnreadNotifs)
+        if (notifCount > 0)
           Positioned(
-            right: 11,
-            top: 11,
+            right: 6,
+            top: 6,
             child: Container(
-              width: 8,
-              height: 8,
-              decoration: const BoxDecoration(color: AppColors.alertRed, shape: BoxShape.circle),
+              padding: const EdgeInsets.all(4),
+              constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+              decoration: BoxDecoration(
+                color: AppColors.alertRed,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '$notifCount',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
       ],

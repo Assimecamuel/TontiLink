@@ -406,9 +406,13 @@ class _ShellNavigationScreenState extends State<ShellNavigationScreen> {
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
-                                    (n['type'] == 'PENALITE')
-                                        ? Icons.gavel_rounded
-                                        : Icons.info_outline_rounded,
+                                    switch (n['type']) {
+                                      'PENALITE' => Icons.gavel_rounded,
+                                      'COTISATION' => Icons.payments_rounded,
+                                      'REUNION' => Icons.event_rounded,
+                                      'TOUR' => Icons.star_rounded,
+                                      _ => Icons.info_outline_rounded,
+                                    },
                                     color: (n['type'] == 'PENALITE')
                                         ? TontiColors.alertRed
                                         : TontiColors.darkGold,
@@ -454,6 +458,20 @@ class _ShellNavigationScreenState extends State<ShellNavigationScreen> {
               ),
             ),
             actions: [
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: TontiColors.darkGold,
+                  side: const BorderSide(color: TontiColors.primaryGold),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () {
+                  ds.simulateExpertNotification();
+                  setDialogState(() {});
+                  setState(() {});
+                },
+                icon: const Icon(Icons.add_alert_rounded, size: 16),
+                label: const Text('Simuler alerte', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: TontiColors.primaryGold,
