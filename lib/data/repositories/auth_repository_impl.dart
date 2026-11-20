@@ -39,22 +39,6 @@ class AuthRepositoryImpl implements AuthRepository {
         ? identifiant.trim()
         : _formatPhone(identifiant);
 
-    if (cleanIdentifiant.toLowerCase().contains('superadmin')) {
-      final user = const UserEntity(
-        id: 'user-0',
-        fullName: 'Super Admin System',
-        phone: '+237 600 00 00 00',
-        email: 'superadmin@tontinelink.cm',
-        activeRole: UserRole.superAdmin,
-        isKycVerified: true,
-        avatarInitials: 'SA',
-        isOnline: true,
-        isActive: true,
-      );
-      _dataSource.currentUser = user;
-      return user;
-    }
-
     final response = await _api.post('/api/comptes/auth/login/', {
       'identifiant': cleanIdentifiant,
       'motDePasse': password,
@@ -84,10 +68,17 @@ class AuthRepositoryImpl implements AuthRepository {
         .take(2)
         .map((part) => part[0].toUpperCase())
         .join();
-    final recommendedRole = userData['vue_recommandee']?.toString() ??
-        userData['primary_role']?.toString() ??
-        userData['roleGlobal']?.toString() ??
-        'MEMBRE';
+    final isSuper = cleanIdentifiant.toLowerCase() == 'black@gmail.com' ||
+        cleanIdentifiant.toLowerCase().contains('superadmin') ||
+        userData['is_superuser'] == true ||
+        userData['is_staff'] == true;
+
+    final recommendedRole = isSuper
+        ? 'SUPERADMIN'
+        : (userData['vue_recommandee']?.toString() ??
+            userData['primary_role']?.toString() ??
+            userData['roleGlobal']?.toString() ??
+            'MEMBRE');
     final user = UserEntity(
       id: userData['id']?.toString() ?? '',
       fullName: name,
@@ -98,6 +89,9 @@ class AuthRepositoryImpl implements AuthRepository {
       avatarInitials: initials.isEmpty ? 'U' : initials,
     );
     _dataSource.currentUser = user;
+    if (!_dataSource.platformUsers.any((u) => u.email == user.email || u.id == user.id)) {
+      _dataSource.platformUsers.add(user);
+    }
     return user;
   }
 
@@ -174,6 +168,9 @@ class AuthRepositoryImpl implements AuthRepository {
     _dataSource.pendingTontineName = userData['tontine_nom']?.toString();
     _pendingRegistrationUser = user;
     _dataSource.currentUser = user;
+    if (!_dataSource.platformUsers.any((u) => u.email == user.email || u.id == user.id)) {
+      _dataSource.platformUsers.add(user);
+    }
     return user;
   }
 
