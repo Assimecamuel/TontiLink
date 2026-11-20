@@ -1,4 +1,5 @@
 enum UserRole {
+  superAdmin,
   president,
   tresorier,
   secretaire,
@@ -14,6 +15,9 @@ class UserEntity {
   final UserRole activeRole;
   final bool isKycVerified;
   final String avatarInitials;
+  final bool isOnline;
+  final bool isActive;
+  final String? lastSeen;
 
   const UserEntity({
     required this.id,
@@ -23,8 +27,12 @@ class UserEntity {
     required this.activeRole,
     this.isKycVerified = true,
     required this.avatarInitials,
+    this.isOnline = false,
+    this.isActive = true,
+    this.lastSeen,
   });
 
+  bool get isSuperAdmin => activeRole == UserRole.superAdmin;
   bool get isPresident => activeRole == UserRole.president;
   bool get isTreasurer => activeRole == UserRole.tresorier;
   bool get isSecretary => activeRole == UserRole.secretaire;
@@ -33,6 +41,8 @@ class UserEntity {
 
   String get roleDisplayName {
     switch (activeRole) {
+      case UserRole.superAdmin:
+        return 'Super Admin';
       case UserRole.president:
         return 'Président';
       case UserRole.tresorier:
@@ -54,6 +64,9 @@ class UserEntity {
     UserRole? activeRole,
     bool? isKycVerified,
     String? avatarInitials,
+    bool? isOnline,
+    bool? isActive,
+    String? lastSeen,
   }) {
     return UserEntity(
       id: id ?? this.id,
@@ -63,6 +76,9 @@ class UserEntity {
       activeRole: activeRole ?? this.activeRole,
       isKycVerified: isKycVerified ?? this.isKycVerified,
       avatarInitials: avatarInitials ?? this.avatarInitials,
+      isOnline: isOnline ?? this.isOnline,
+      isActive: isActive ?? this.isActive,
+      lastSeen: lastSeen ?? this.lastSeen,
     );
   }
 }

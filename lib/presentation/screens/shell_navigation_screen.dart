@@ -24,6 +24,7 @@ import 'prets_entraide/prets_entraide_screen.dart';
 import 'repayments/remboursements_screen.dart';
 import 'reunions/reunions_screen.dart';
 import 'settings/settings_screen.dart';
+import 'admin/user_management_screen.dart';
 import '../widgets/common/notifications_dialog.dart';
 
 class ShellNavigationScreen extends StatefulWidget {
@@ -437,6 +438,9 @@ class _ShellNavigationScreenState extends State<ShellNavigationScreen> {
         case 8:
           bodyContent = RemboursementsScreen(activeRole: _activeRole);
           break;
+        case 9:
+          bodyContent = const UserManagementScreen();
+          break;
         case 7:
           bodyContent = SettingsScreen(
             activeRole: _activeRole,
@@ -449,6 +453,10 @@ class _ShellNavigationScreenState extends State<ShellNavigationScreen> {
               if (currentUser != null) {
                 UserRole mappedRole;
                 switch (newRole.toLowerCase()) {
+                  case 'super admin':
+                  case 'superadmin':
+                    mappedRole = UserRole.superAdmin;
+                    break;
                   case 'président':
                   case 'president':
                     mappedRole = UserRole.president;

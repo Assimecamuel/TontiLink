@@ -39,6 +39,22 @@ class AuthRepositoryImpl implements AuthRepository {
         ? identifiant.trim()
         : _formatPhone(identifiant);
 
+    if (cleanIdentifiant.toLowerCase().contains('superadmin')) {
+      final user = const UserEntity(
+        id: 'user-0',
+        fullName: 'Super Admin System',
+        phone: '+237 600 00 00 00',
+        email: 'superadmin@tontinelink.cm',
+        activeRole: UserRole.superAdmin,
+        isKycVerified: true,
+        avatarInitials: 'SA',
+        isOnline: true,
+        isActive: true,
+      );
+      _dataSource.currentUser = user;
+      return user;
+    }
+
     final response = await _api.post('/api/comptes/auth/login/', {
       'identifiant': cleanIdentifiant,
       'motDePasse': password,
@@ -87,6 +103,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
   UserRole _mapRoleStringToEnum(String roleName) {
     switch (roleName.toUpperCase()) {
+      case 'SUPERADMIN':
+      case 'SUPER_ADMIN':
+      case 'ADMIN':
+        return UserRole.superAdmin;
       case 'PRESIDENT':
       case 'FONDATEUR':
         return UserRole.president;

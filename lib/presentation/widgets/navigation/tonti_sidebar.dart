@@ -42,6 +42,8 @@ class TontiSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final roleLower = activeRole.toLowerCase();
+    final currentUser = AuthController().currentUser;
+    final isSuperAdmin = (currentUser != null && currentUser.isSuperAdmin) || roleLower.contains('super') || roleLower == 'super admin';
     final isPresident = roleLower.contains('président') || roleLower.contains('president');
     final isSecretary = roleLower.contains('secrétaire') || roleLower.contains('secretaire');
     final isTreasurer = roleLower.contains('trésorier') || roleLower.contains('tresorier');
@@ -50,7 +52,41 @@ class TontiSidebar extends StatelessWidget {
     // Définition des groupes accordéon avec traductions i18n
     final List<_SidebarAccordionGroup> accordionGroups;
 
-    if (isSecretary) {
+    if (isSuperAdmin) {
+      accordionGroups = [
+        _SidebarAccordionGroup(
+          title: tr('Supervision Admin'),
+          icon: Icons.admin_panel_settings,
+          items: [
+            [9, 'Utilisateurs', Icons.people_alt_rounded],
+          ],
+        ),
+        _SidebarAccordionGroup(
+          title: tr('Espace Principal'),
+          icon: Icons.space_dashboard_rounded,
+          items: [
+            [0, 'nav_dashboard', Icons.dashboard_rounded],
+            [1, 'nav_tontines', Icons.account_balance_rounded],
+          ],
+        ),
+        _SidebarAccordionGroup(
+          title: tr('Finances & Cotisations'),
+          icon: Icons.account_balance_wallet_rounded,
+          items: [
+            [2, 'nav_contrib', Icons.payments_rounded],
+            [3, 'nav_distrib', Icons.sync_alt_rounded],
+            [4, 'nav_cash', Icons.savings_rounded],
+          ],
+        ),
+        _SidebarAccordionGroup(
+          title: tr('Système & Profil'),
+          icon: Icons.tune_rounded,
+          items: [
+            [7, 'nav_settings', Icons.settings_rounded],
+          ],
+        ),
+      ];
+    } else if (isSecretary) {
       accordionGroups = [
         _SidebarAccordionGroup(
           title: tr('Espace Secrétariat'),

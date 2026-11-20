@@ -30,8 +30,20 @@ class TontiSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final groups = const [
-      _SidebarGroup(
+    final roleLower = activeRole.toLowerCase();
+    final currentUser = AuthController().currentUser;
+    final isSuperAdmin = (currentUser != null && currentUser.isSuperAdmin) || roleLower.contains('super') || roleLower == 'super admin';
+
+    final groups = [
+      if (isSuperAdmin)
+        const _SidebarGroup(
+          title: 'Supervision Admin',
+          icon: Icons.admin_panel_settings_outlined,
+          items: [
+            [9, 'Utilisateurs', Icons.people_outline, Icons.people],
+          ],
+        ),
+      const _SidebarGroup(
         title: 'Espace Principal',
         icon: Icons.space_dashboard_outlined,
         items: [

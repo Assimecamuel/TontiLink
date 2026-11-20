@@ -20,6 +20,7 @@ import '../../../domain/entities/distribution_entity.dart';
 import '../../../domain/entities/member_entity.dart';
 import 'widgets/upcoming_distribution_banner.dart';
 import 'widgets/recent_transactions_table.dart';
+import '../admin/user_management_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final VoidCallback onNavigateToTontines;
@@ -340,13 +341,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildQuickAccess() {
     final roleLower = widget.activeRole.toLowerCase();
+    final isSuperAdmin = roleLower.contains('super') || roleLower.contains('admin');
     final isPresident = roleLower.contains('président') || roleLower.contains('president');
     final isSecretary = roleLower.contains('secrétaire') || roleLower.contains('secretaire');
     final isTreasurer = roleLower.contains('trésorier') || roleLower.contains('tresorier');
 
     final List<Widget> cards;
 
-    if (isSecretary) {
+    if (isSuperAdmin) {
+      cards = [
+        _QuickAccessCard(
+          icon: Icons.admin_panel_settings,
+          title: tr('Gestion Utilisateurs & Comptes'),
+          description: tr('Voir qui est en ligne 🟢, désactiver ou supprimer des comptes'),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => Scaffold(
+                  appBar: AppBar(title: Text(tr('Supervision Super Admin'))),
+                  body: const UserManagementScreen(),
+                ),
+              ),
+            );
+          },
+        ),
+        _QuickAccessCard(
+          icon: Icons.account_balance_rounded,
+          title: tr('Toutes les Tontines'),
+          description: tr('Vue globale et supervision statutaire'),
+          onTap: widget.onNavigateToTontines,
+        ),
+        _QuickAccessCard(
+          icon: Icons.payments_rounded,
+          title: tr('Finances & Cotisations'),
+          description: tr('Consulter l\'ensemble des écritures'),
+          onTap: widget.onNavigateToCotisations,
+        ),
+      ];
+    } else if (isSecretary) {
       cards = [
         _QuickAccessCard(
           icon: Icons.event_available_rounded,
@@ -488,6 +521,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildRoleStatutoryBanner(BuildContext context) {
     UserRole? role = AuthController().currentUser?.activeRole;
+    if (widget.activeRole == 'Super Admin') role = UserRole.superAdmin;
     if (widget.activeRole == 'Président') role = UserRole.president;
     if (widget.activeRole == 'Trésorier') role = UserRole.tresorier;
     if (widget.activeRole == 'Secrétaire') role = UserRole.secretaire;
@@ -502,50 +536,59 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Color iconColor = TontiColors.darkGold;
     IconData icon = Icons.shield_rounded;
 
-    if (role != null) {
-      switch (role) {
-        case UserRole.president:
-          roleTitle = '👑 Mode Président : Habilitation Statutaire Complète';
-          roleDesc =
-              'Vous avez le pouvoir exclusif d\'attribuer ou modifier les rôles des membres de la tontine, d\'arbitrer les tirages et de co-signer le déblocage des cagnottes.';
-          break;
-        case UserRole.tresorier:
-          roleTitle = '💰 Mode Trésorière : Gestion de Caisse & Rapprochement';
-          roleDesc =
-              'Vous êtes habilitée à enregistrer les cotisations, rapprocher les comptes MoMo / banque et préparer les distributions. (La modification des rôles des membres est réservée au Président).';
-          bannerBg = TontiColors.successSoft;
-          bannerBorder = TontiColors.successGreen.withOpacity(0.4);
-          iconColor = TontiColors.successGreen;
-          icon = Icons.account_balance_wallet;
-          break;
-        case UserRole.secretaire:
-          roleTitle = '📝 Mode Secrétaire : Registres & Assemblées';
-          roleDesc =
-              'Vous gérez la feuille d\'émargement en direct, rédigez les procès-verbaux et archivez les documents officiels.';
-          bannerBg = TontiColors.infoSoft;
-          bannerBorder = TontiColors.infoBlue.withOpacity(0.4);
-          iconColor = TontiColors.infoBlue;
-          icon = Icons.edit_note;
-          break;
-        case UserRole.commissaire:
-          roleTitle = '🔍 Mode Commissaire aux Comptes : Audit Indépendant';
-          roleDesc =
-              'Vous bénéficiez d\'une vue d\'audit complète sur l\'ensemble des écritures et pièces justificatives, sans pouvoir de modification directe.';
-          bannerBg = TontiColors.surfaceMuted;
-          bannerBorder = TontiColors.border;
-          iconColor = TontiColors.textSecondary;
-          icon = Icons.fact_check_outlined;
-          break;
-        case UserRole.membre:
-          roleTitle = '👤 Espace Membre : Consultation & Cotisation';
-          roleDesc =
-              'Consultez votre tour de passage, effectuez vos cotisations en ligne et soumettez vos demandes de prêt ou d\'assistance sociale.';
-          bannerBg = TontiColors.cardSubtle;
-          bannerBorder = TontiColors.border;
-          iconColor = TontiColors.darkGold;
-          icon = Icons.person;
-          break;
-      }
+    final UserRole effectiveRole = role ?? UserRole.president;
+
+    switch (effectiveRole) {
+      case UserRole.superAdmin:
+        roleTitle = '🛡️ Mode Super Admin : Supervision Globale de la Plateforme';
+        roleDesc =
+            'Vous avez un accès total à la supervision de la plateforme, la gestion des comptes utilisateurs, la désactivation et la suppression de comptes.';
+        bannerBg = TontiColors.goldSoft;
+        bannerBorder = TontiColors.primaryGold;
+        iconColor = TontiColors.primaryGold;
+        icon = Icons.admin_panel_settings;
+        break;
+      case UserRole.president:
+        roleTitle = '👑 Mode Président : Habilitation Statutaire Complète';
+        roleDesc =
+            'Vous avez le pouvoir exclusif d\'attribuer ou modifier les rôles des membres de la tontine, d\'arbitrer les tirages et de co-signer le déblocage des cagnottes.';
+        break;
+      case UserRole.tresorier:
+        roleTitle = '💰 Mode Trésorière : Gestion de Caisse & Rapprochement';
+        roleDesc =
+            'Vous êtes habilitée à enregistrer les cotisations, rapprocher les comptes MoMo / banque et préparer les distributions. (La modification des rôles des membres est réservée au Président).';
+        bannerBg = TontiColors.successSoft;
+        bannerBorder = TontiColors.successGreen.withOpacity(0.4);
+        iconColor = TontiColors.successGreen;
+        icon = Icons.account_balance_wallet;
+        break;
+      case UserRole.secretaire:
+        roleTitle = '📝 Mode Secrétaire : Registres & Assemblées';
+        roleDesc =
+            'Vous gérez la feuille d\'émargement en direct, rédigez les procès-verbaux et archivez les documents officiels.';
+        bannerBg = TontiColors.infoSoft;
+        bannerBorder = TontiColors.infoBlue.withOpacity(0.4);
+        iconColor = TontiColors.infoBlue;
+        icon = Icons.edit_note;
+        break;
+      case UserRole.commissaire:
+        roleTitle = '🔍 Mode Commissaire aux Comptes : Audit Indépendant';
+        roleDesc =
+            'Vous bénéficiez d\'une vue d\'audit complète sur l\'ensemble des écritures et pièces justificatives, sans pouvoir de modification directe.';
+        bannerBg = TontiColors.surfaceMuted;
+        bannerBorder = TontiColors.border;
+        iconColor = TontiColors.textSecondary;
+        icon = Icons.fact_check_outlined;
+        break;
+      case UserRole.membre:
+        roleTitle = '👤 Espace Membre : Consultation & Cotisation';
+        roleDesc =
+            'Consultez votre tour de passage, effectuez vos cotisations en ligne et soumettez vos demandes de prêt ou d\'assistance sociale.';
+        bannerBg = TontiColors.cardSubtle;
+        bannerBorder = TontiColors.border;
+        iconColor = TontiColors.darkGold;
+        icon = Icons.person;
+        break;
     }
 
     return Container(
@@ -916,6 +959,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
             style: TextStyle(fontSize: 12, color: TontiColors.textSecondary),
           ),
           const SizedBox(height: 18),
+          if (widget.activeRole == 'Super Admin' || (AuthController().currentUser?.isSuperAdmin ?? false)) ...[
+            _buildActionButton(
+              icon: Icons.admin_panel_settings,
+              iconColor: TontiColors.primaryGold,
+              title: tr('Supervision des Comptes (Super Admin)'),
+              subtitle: tr('Voir les utilisateurs en ligne 🟢, désactiver ou supprimer des comptes'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => Scaffold(
+                      appBar: AppBar(title: Text(tr('Supervision Super Admin'))),
+                      body: const UserManagementScreen(),
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 10),
+          ],
           _buildActionButton(
             icon: Icons.receipt_long,
             iconColor: TontiColors.primaryGold,

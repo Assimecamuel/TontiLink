@@ -26,6 +26,7 @@ class AuthController extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   UserRole get activeRole => _currentUser?.activeRole ?? UserRole.president;
+  bool get isSuperAdmin => _currentUser?.isSuperAdmin ?? false;
   bool get isPresident => _currentUser?.isPresident ?? false;
   bool get isTreasurer => _currentUser?.isTreasurer ?? false;
   bool get isSecretary => _currentUser?.isSecretary ?? false;

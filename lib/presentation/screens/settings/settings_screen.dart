@@ -9,6 +9,7 @@ import '../../widgets/common/tonti_card.dart';
 import '../../widgets/common/tonti_badge.dart';
 import '../../controllers/auth_controller.dart';
 import '../../../core/i18n/l10n.dart';
+import '../admin/user_management_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   final String activeRole;
@@ -100,6 +101,8 @@ class SettingsScreen extends StatelessWidget {
                       spacing: 10,
                       runSpacing: 10,
                       children: [
+                        if (AuthController().currentUser?.isSuperAdmin ?? false)
+                          _buildRoleOption('Super Admin', 'Supervision des comptes, blocage/désactivation & suppression'),
                         _buildRoleOption('Président', 'Coordination générale et signature des levées'),
                         _buildRoleOption('Trésorier', 'Saisie des cotisations, caisse et validation des transferts'),
                         _buildRoleOption('Secrétaire', 'Émargement, réunions et procès-verbaux'),
@@ -170,7 +173,7 @@ class SettingsScreen extends StatelessWidget {
                               );
                             }
                             return Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 for (int i = 0; i < options.length; i++) ...[
                                   if (i > 0) const SizedBox(width: 12),
