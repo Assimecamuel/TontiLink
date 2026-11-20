@@ -1900,10 +1900,97 @@ class LocalTontiDataSource {
   }
 
   void _updatePlatformUsersFromBackend() {
+    final defaultUsers = [
+      const UserEntity(
+        id: 'user-0',
+        fullName: 'Super Admin System',
+        phone: '+237 600 00 00 00',
+        email: 'superadmin@tontinelink.cm',
+        activeRole: UserRole.superAdmin,
+        isKycVerified: true,
+        avatarInitials: 'SA',
+        isOnline: true,
+        isActive: true,
+        lastSeen: 'À l\'instant',
+      ),
+      const UserEntity(
+        id: 'user-1',
+        fullName: 'Paul Eric Kamdem',
+        phone: '+237 677 45 89 12',
+        email: 'pauleric.kamdem@tontinelink.cm',
+        activeRole: UserRole.president,
+        isKycVerified: true,
+        avatarInitials: 'PE',
+        isOnline: true,
+        isActive: true,
+        lastSeen: 'À l\'instant',
+      ),
+      const UserEntity(
+        id: 'user-2',
+        fullName: 'Jeanne Ngo Bayi',
+        phone: '+237 699 12 34 56',
+        email: 'jeanne.ngobayi@tontinelink.cm',
+        activeRole: UserRole.tresorier,
+        isKycVerified: true,
+        avatarInitials: 'JNB',
+        isOnline: true,
+        isActive: true,
+        lastSeen: 'Il y a 2 min',
+      ),
+      const UserEntity(
+        id: 'user-3',
+        fullName: 'Samuel Eto\'o Talla',
+        phone: '+237 655 78 90 23',
+        email: 'samuel.etoo@tontinelink.cm',
+        activeRole: UserRole.secretaire,
+        isKycVerified: true,
+        avatarInitials: 'SET',
+        isOnline: false,
+        isActive: true,
+        lastSeen: 'Il y a 1 heure',
+      ),
+      const UserEntity(
+        id: 'user-4',
+        fullName: 'Chantal Mbarga',
+        phone: '+237 670 11 22 33',
+        email: 'chantal.mbarga@tontinelink.cm',
+        activeRole: UserRole.commissaire,
+        isKycVerified: true,
+        avatarInitials: 'CM',
+        isOnline: true,
+        isActive: true,
+        lastSeen: 'À l\'instant',
+      ),
+      const UserEntity(
+        id: 'user-5',
+        fullName: 'Marc Alain Tchakounte',
+        phone: '+237 680 44 55 66',
+        email: 'marc.tchakounte@tontinelink.cm',
+        activeRole: UserRole.membre,
+        isKycVerified: false,
+        avatarInitials: 'MT',
+        isOnline: false,
+        isActive: false,
+        lastSeen: 'Hier 18:45',
+      ),
+      const UserEntity(
+        id: 'user-6',
+        fullName: 'Marie-Claire Ondoua',
+        phone: '+237 691 88 99 00',
+        email: 'marie.ondoua@tontinelink.cm',
+        activeRole: UserRole.membre,
+        isKycVerified: true,
+        avatarInitials: 'MO',
+        isOnline: false,
+        isActive: true,
+        lastSeen: 'Il y a 3 heures',
+      ),
+    ];
+
+    final backendUsers = <UserEntity>[];
     if (visibleUsers.isNotEmpty) {
-      final updated = <UserEntity>[];
       for (final j in visibleUsers) {
-        final id = j['id']?.toString() ?? j['pk']?.toString() ?? 'u-${updated.length + 1}';
+        final id = j['id']?.toString() ?? j['pk']?.toString() ?? 'u-${backendUsers.length + 1}';
         final name = j['nom']?.toString() ?? j['fullName']?.toString() ?? j['username']?.toString() ?? 'Utilisateur';
         final phone = j['telephone']?.toString() ?? j['phone']?.toString() ?? '';
         final email = j['email']?.toString() ?? '';
@@ -1913,7 +2000,7 @@ class LocalTontiDataSource {
         final isActive = j['isActive'] as bool? ?? j['actif'] as bool? ?? true;
         final isOnline = j['isOnline'] as bool? ?? j['enLigne'] as bool? ?? false;
 
-        updated.add(UserEntity(
+        backendUsers.add(UserEntity(
           id: id,
           fullName: name,
           phone: phone,
@@ -1926,12 +2013,19 @@ class LocalTontiDataSource {
           lastSeen: isOnline ? 'À l\'instant' : 'Récemment',
         ));
       }
-      if (!updated.any((u) => u.id == currentUser.id) && currentUser.id.isNotEmpty) {
-        updated.insert(0, currentUser);
-      }
-      if (updated.isNotEmpty) {
-        platformUsers = updated;
-      }
+    }
+
+    final merged = <String, UserEntity>{};
+    for (final u in defaultUsers) {
+      merged[u.email.isNotEmpty ? u.email : u.id] = u;
+    }
+    for (final u in backendUsers) {
+      merged[u.email.isNotEmpty ? u.email : u.id] = u;
+    }
+
+    platformUsers = merged.values.toList();
+    if (!platformUsers.any((u) => u.id == currentUser.id) && currentUser.id.isNotEmpty) {
+      platformUsers.insert(0, currentUser);
     }
   }
 
